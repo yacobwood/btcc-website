@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: #080912;
+  --color-surface: #0F1122;
+  --color-surface-2: #161828;
+  --color-btcc-red: #FEBD02;
+  --color-btcc-red-dark: #CC9800;
+  --color-foreground: #FFFFFF;
+  --color-muted: #8B8FA8;
+  --color-border: #2A2D44;
+  --font-sans: var(--font-barlow);
+  --font-condensed: var(--font-barlow-condensed);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #080912;
+  color: #FFFFFF;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F1122;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2D44;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FEBD02;
+}
+
+/* Article body content from WordPress */
+.article-content {
+  color: #D1D5DB;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.article-content p { margin: 0 0 1.4em; }
+.article-content h2 { font-family: var(--font-barlow-condensed); font-weight: 800; font-size: 1.6em; color: #fff; margin: 1.8em 0 0.6em; letter-spacing: 0.02em; }
+.article-content h3 { font-family: var(--font-barlow-condensed); font-weight: 700; font-size: 1.3em; color: #fff; margin: 1.4em 0 0.5em; }
+.article-content a { color: #FEBD02; text-decoration: underline; }
+.article-content ul, .article-content ol { margin: 0 0 1.4em 1.5em; }
+.article-content li { margin-bottom: 0.4em; }
+.article-content img { max-width: 100%; height: auto; margin: 1.5em 0; }
+.article-content blockquote { border-left: 3px solid #FEBD02; margin: 1.5em 0; padding: 0.5em 1.2em; color: #8B8FA8; font-style: italic; }
+.article-content strong { color: #fff; font-weight: 700; }
+.article-content figure { margin: 1.5em 0; }
+.article-content figcaption { font-size: 13px; color: #8B8FA8; margin-top: 6px; text-align: center; }
