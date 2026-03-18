@@ -1,13 +1,10 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.btccfanhub",
-      "sha256_cert_fingerprints": [
-        "45:51:47:57:0D:BE:1C:91:C1:5D:CE:78:9A:0D:E7:84:C4:07:1F:89:49:17:3D:28:26:8D:85:2E:BF:66:91:31",
-        "F0:E9:8A:87:FE:EF:CC:FE:48:E6:44:25:78:70:5F:7E:AB:12:50:64:3E:DC:71:C4:46:3C:FE:B2:5E:AC:9B:B5"
-      ]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.btccfanhub",
+    "sha256_cert_fingerprints": [
+      "CA:8A:6B:BE:9F:BE:37:A1:F8:2F:7C:17:92:5A:B7:EC:08:42:D1:FC:C4:7B:CD:0A:84:B5:B6:38:07:7B:F3:49"
+    ]
   }
-]
+}]
