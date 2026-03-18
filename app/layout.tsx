@@ -17,6 +17,7 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://btcchub.vercel.app"),
   title: "BTCC — British Touring Car Championship",
   description:
     "The official home of the British Touring Car Championship. Latest news, race results, driver standings, and the 2026 season calendar.",
