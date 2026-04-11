@@ -10,7 +10,7 @@ const FLAG_DESCRIPTIONS: Record<string, string> = {
   podcast_last_episode_url: "URL of the last podcast episode that triggered a notification (auto-managed)",
   radio_tab: "Show the Radio section in the app",
   banner_ad: "Show banner ads in the app",
-  newsfeed_ad: "Show ads within the news feed",
+  search_ad: "Show ad when search is open in the news feed",
   whats_new: "Show the What's New dialog on app update",
   live_updates: "Enable live timing SignalR updates",
   results_notifications: "Enable push notifications for results",
