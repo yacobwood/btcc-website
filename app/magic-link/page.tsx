@@ -1,19 +1,26 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Sign In | BTCC Hub",
-  robots: { index: false },
-};
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function MagicLinkPage({
-  searchParams,
-}: {
-  searchParams: { link?: string };
-}) {
-  const link = searchParams.link ?? "";
+export default function MagicLinkPage() {
+  const searchParams = useSearchParams();
+  const link = searchParams.get("link") ?? "";
+  const [launched, setLaunched] = useState(false);
+
   const appUrl = link
     ? `btccfanhub://magic-link?link=${encodeURIComponent(link)}`
     : "btccfanhub://";
+
+  useEffect(() => {
+    // Redirect to the custom scheme immediately — Chrome will launch the app.
+    window.location.href = appUrl;
+    // Show the fallback button after a short delay in case the app didn't open.
+    const t = setTimeout(() => setLaunched(true), 1500);
+    return () => clearTimeout(t);
+  }, [appUrl]);
+
+  if (!launched) return null;
 
   return (
     <div
@@ -45,15 +52,8 @@ export default function MagicLinkPage({
         >
           Sign In to BTCC Hub
         </h1>
-        <p
-          style={{
-            color: "#8B8FA8",
-            fontSize: 15,
-            lineHeight: 1.65,
-            margin: "0 0 36px",
-          }}
-        >
-          Tap the button below to open the BTCC Hub app and complete sign in.
+        <p style={{ color: "#8B8FA8", fontSize: 15, lineHeight: 1.65, margin: "0 0 36px" }}>
+          The app did not open automatically. Tap below to try again.
         </p>
         <a
           href={appUrl}
@@ -72,15 +72,8 @@ export default function MagicLinkPage({
         >
           Open BTCC Hub
         </a>
-        <p
-          style={{
-            color: "#8B8FA8",
-            fontSize: 12,
-            marginTop: 24,
-            lineHeight: 1.5,
-          }}
-        >
-          If the button does not work, make sure BTCC Hub is installed on your device.
+        <p style={{ color: "#8B8FA8", fontSize: 12, marginTop: 24, lineHeight: 1.5 }}>
+          Make sure BTCC Hub is installed on your device.
         </p>
       </div>
     </div>
