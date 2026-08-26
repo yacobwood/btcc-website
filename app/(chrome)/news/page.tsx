@@ -7,26 +7,37 @@ export const metadata: Metadata = {
   description: "The latest news from the British Touring Car Championship.",
 };
 
+// Same fix as news/[slug]/page.tsx - btcc.net's own wp-json API is
+// rate-limited/blocked in production (confirmed live: 429), the same
+// problem that already forced the app to migrate to this GitHub-hosted
+// mirror. This list page was pointed at the dead endpoint too, showing
+// "No articles available right now." unconditionally.
+const MIRROR_BASE = "https://raw.githubusercontent.com/yacobwood/BTCC/main/data/articles";
+
+interface MirrorPost {
+  id: string;
+  slug: string;
+  date: string;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  _embedded?: { "wp:featuredmedia"?: { source_url: string }[] };
+}
+
 async function getNews(page = 1) {
   try {
-    const res = await fetch(
-      `https://www.btcc.net/wp-json/wp/v2/posts?per_page=20&page=${page}&_embed=1`,
-      { next: { revalidate: 300 } }
-    );
+    const res = await fetch(`${MIRROR_BASE}/page_${page}.json`, { next: { revalidate: 300 } });
     if (!res.ok) return { articles: [], total: 0 };
-    const data = await res.json();
-    const total = parseInt(res.headers.get("X-WP-TotalPages") ?? "1");
+    const data: MirrorPost[] = await res.json();
     return {
-      articles: data.map((post: any) => ({
+      articles: data.map((post) => ({
         id: post.id,
         slug: post.slug,
         title: post.title?.rendered ?? "",
         excerpt: post.excerpt?.rendered?.replace(/<[^>]+>/g, "").trim() ?? "",
         date: post.date,
         imageUrl: post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ?? null,
-        categories: post._embedded?.["wp:term"]?.[0]?.map((t: any) => t.name) ?? [],
       })),
-      total,
+      total: 1,
     };
   } catch {
     return { articles: [], total: 0 };
@@ -136,7 +147,7 @@ export default async function NewsPage() {
           gap: 24,
         }}
       >
-        {rest.map((a: any) => (
+        {rest.map((a) => (
           <Link
             key={a.id}
             href={`/news/${a.slug}`}
