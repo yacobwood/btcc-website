@@ -3,7 +3,7 @@ import standingsRaw from "@/data/standings.json";
 import calendarRaw from "@/data/calendar.json";
 import resultsRaw from "@/data/results.json";
 import results2025Raw from "@/data/results2025.json";
-import type { Driver, StandingEntry, TeamStanding, Round } from "@/types";
+import type { Driver, StandingEntry, TeamStanding, Round, ResultsData, ResultsRound } from "@/types";
 
 export function getDrivers(): Driver[] {
   return driversRaw.drivers as Driver[];
@@ -33,6 +33,29 @@ export function getCalendar(): Round[] {
 
 export function getResults() {
   return resultsRaw;
+}
+
+// Current-season round-by-round results (data/results.json - a snapshot
+// copied from the app repo's data/results2026.json, same "copy, don't
+// live-sync" pattern already used for results2025.json). Powers
+// /results/[round] - the page a shared "Round N results" link opens to.
+export function getRoundResults(round: number): ResultsRound | undefined {
+  return (resultsRaw as unknown as ResultsData).rounds.find((r) => r.round === round);
+}
+
+export function getAllRoundResults(): ResultsRound[] {
+  return (resultsRaw as unknown as ResultsData).rounds;
+}
+
+// Abbreviates session labels for tab display - matches
+// RoundResultsScreen.js's shortLabel() in the app exactly.
+export function shortSessionLabel(label: string): string {
+  if (label === "Free Practice") return "FP";
+  if (label === "Qualifying") return "QUAL";
+  if (label === "Qualifying Race") return "Q RACE";
+  const m = label.match(/^Race (\d)$/);
+  if (m) return `R${m[1]}`;
+  return label;
 }
 
 export function getResults2025() {

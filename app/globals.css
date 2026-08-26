@@ -37,20 +37,37 @@ body {
   background: #FEBD02;
 }
 
-/* Article body content from WordPress */
+/* Article body content - only used on /news/[slug], which is styled to
+   match ArticleScreen.js's own WebView CSS exactly (buildHtml() in the app
+   repo) rather than the rest of the website's Barlow-Condensed look. Body
+   copy is plain white (#fff) here, not the website's usual muted gray -
+   that's a deliberate match to the app, not an oversight. */
 .article-content {
-  color: #D1D5DB;
+  color: #fff;
   font-size: 16px;
   line-height: 1.75;
 }
 .article-content p { margin: 0 0 1.4em; }
-.article-content h2 { font-family: var(--font-barlow-condensed); font-weight: 800; font-size: 1.6em; color: #fff; margin: 1.8em 0 0.6em; letter-spacing: 0.02em; }
-.article-content h3 { font-family: var(--font-barlow-condensed); font-weight: 700; font-size: 1.3em; color: #fff; margin: 1.4em 0 0.5em; }
+.article-content h2 { font-weight: 800; font-size: 1.6em; color: #fff; margin: 1.8em 0 0.6em; }
+.article-content h3 { font-weight: 700; font-size: 1.3em; color: #fff; margin: 1.4em 0 0.5em; }
 .article-content a { color: #FEBD02; text-decoration: underline; }
-.article-content ul, .article-content ol { margin: 0 0 1.4em 1.5em; }
+.article-content ul, .article-content ol {
+  padding-left: 1.5em;
+  background: rgba(255,255,255,0.05);
+  border-left: 3px solid #FEBD02;
+  border-radius: 6px;
+  padding: 14px 14px 14px 28px;
+  margin: 16px 0;
+}
 .article-content li { margin-bottom: 0.4em; }
-.article-content img { max-width: 100%; height: auto; margin: 1.5em 0; }
+.article-content img { max-width: 100%; height: auto; margin: 1.5em 0; border-radius: 8px; }
 .article-content blockquote { border-left: 3px solid #FEBD02; margin: 1.5em 0; padding: 0.5em 1.2em; color: #8B8FA8; font-style: italic; }
 .article-content strong { color: #fff; font-weight: 700; }
 .article-content figure { margin: 1.5em 0; }
 .article-content figcaption { font-size: 13px; color: #8B8FA8; margin-top: 6px; text-align: center; }
+/* display:block + overflow-x here does the same job as the app's JS-inserted
+   .table-wrap div, without needing to post-process the raw HTML string. */
+.article-content table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; width: auto; min-width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0; }
+.article-content th, .article-content td { border: 1px solid #333; padding: 8px 10px; text-align: left; white-space: nowrap; }
+.article-content th { background: rgba(255,255,255,0.08); font-weight: 700; color: #fff; }
+.article-content td { color: #ccc; }

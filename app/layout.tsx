@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import OpenInAppBanner from "@/components/OpenInAppBanner";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -39,9 +38,8 @@ export default function RootLayout({
         className={`${barlow.variable} ${barlowCondensed.variable} antialiased`}
         style={{ fontFamily: "var(--font-barlow), Arial, sans-serif", background: "#080912", color: "#fff" }}
       >
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <OpenInAppBanner />
+        {children}
       </body>
     </html>
   );
