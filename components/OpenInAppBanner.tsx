@@ -2,33 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Colors } from "@/lib/appTheme";
+import { PLAY_STORE_URL, isAndroid, buildIntentUrl } from "@/lib/appLinks";
 
-const PACKAGE_NAME = "com.btccfanhub";
-const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${PACKAGE_NAME}`;
 const DISMISS_KEY = "btcchub_open_in_app_dismissed";
-
-// Android only - there is currently no live iOS distribution to open (BTCC
-// declined the permission needed for it), so an iOS banner would just be a
-// dead end. Detected via UA rather than a build flag since this is the one
-// piece of state that's genuinely about the visitor's device, not the site.
-function isAndroid() {
-  return typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
-}
-
-// Reproduces the Android-native `intent://` URI - this is the one link
-// format that reliably bypasses an in-app browser forcing a bound
-// CustomTabsSession (which is exactly why links tapped inside WhatsApp open
-// Chrome instead of the app - see the intent scheme docs linked in the PR
-// description). A verified HTTPS App Link tapped from a normal page doesn't
-// need this, but this banner exists specifically for the case where the
-// visitor already ended up in a browser some other way, so it always uses
-// the most reliable form rather than assuming a plain https:// link would work.
-function buildIntentUrl(pathAndQuery: string) {
-  const target = `https://btcchub.vercel.app${pathAndQuery}`;
-  const withoutScheme = target.replace(/^https?:\/\//, "");
-  const fallback = encodeURIComponent(PLAY_STORE_URL);
-  return `intent://${withoutScheme}#Intent;scheme=https;package=${PACKAGE_NAME};S.browser_fallback_url=${fallback};end`;
-}
 
 export default function OpenInAppBanner() {
   const [visible, setVisible] = useState(false);
