@@ -1,62 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Colors, SYSTEM_FONT_STACK } from "@/lib/appTheme";
 import { PLAY_STORE_URL, isAndroid, buildIntentUrl } from "@/lib/appLinks";
-
-// How long to wait, after attempting to open the app, before concluding it
-// isn't installed and switching to the "get the app" state. There's no
-// reliable way for a web page to directly ask "is this app installed?" -
-// this is the same timing heuristic every app doing this relies on
-// (Instagram, Twitter, etc.): attempt the open, and if the tab is still
-// visible once this fires, the OS never switched away.
-const AUTO_ATTEMPT_TIMEOUT_MS = 1500;
 
 export default function AppGate({ path }: { path: string }) {
   // Starts as the plain Play Store link (a safe, universally-valid default
   // for the first paint, matching OpenInAppBanner's own hydration-safe
   // pattern) - replaced once the effect below knows the real device/path.
   const [href, setHref] = useState(PLAY_STORE_URL);
-  // Whether to show the "didn't open automatically" state (button label
-  // changes, a hint appears) - not whether the ad COPY is visible, that's
-  // always on screen regardless, so there's something to read immediately
-  // rather than a blank moment while the auto-attempt is still pending.
-  const [showFallback, setShowFallback] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Deliberately NOT an automatic `window.location.href = intentHref` on
+  // mount here - confirmed live (2026-08-29, real device/emulator testing,
+  // not assumed) that Chrome requires a genuine user gesture (a tap) before
+  // it will honour navigation to a custom scheme like `intent://`. An
+  // automatic redirect fired from an effect has no gesture behind it, so
+  // Chrome doesn't silently fail it - it actively falls through to the
+  // intent URI's own embedded browser_fallback_url (the Play Store)
+  // immediately, which is worse than doing nothing: it was firing the "not
+  // installed" outcome even on a device that DOES have the app. The button
+  // below is the only trigger - a real tap is a real gesture, which is what
+  // lets `intent://` actually switch to the app (confirmed working via a
+  // real tap, not just theorised).
   useEffect(() => {
-    if (!isAndroid()) {
-      // intent:// is an Android-specific scheme - on iOS/desktop it wouldn't
-      // do anything useful, so this is a plain Play Store link instead.
-      // There's no live iOS app to offer (BTCC declined the permission
-      // needed for that distribution), so there's nothing else to try here.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setHref(PLAY_STORE_URL);
-      setShowFallback(true);
-      return;
-    }
-
-    const intentHref = buildIntentUrl(path);
-    setHref(intentHref);
-    window.location.href = intentHref;
-
-    const onVisibilityChange = () => {
-      // Tab backgrounded - the OS switched to the app. Nothing further to
-      // do; cancel the fallback timer so it can't fire after the fact (e.g.
-      // if the visitor switches back to this tab later for some reason).
-      if (document.hidden && timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    timerRef.current = setTimeout(() => setShowFallback(true), AUTO_ATTEMPT_TIMEOUT_MS);
-
-    return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHref(isAndroid() ? buildIntentUrl(path) : PLAY_STORE_URL);
   }, [path]);
 
   return (
@@ -116,10 +84,10 @@ export default function AppGate({ path }: { path: string }) {
           textDecoration: "none",
         }}
       >
-        {showFallback ? "GET THE APP" : "OPEN IN APP"}
+        OPEN IN APP
       </a>
       <p style={{ color: Colors.textSecondary, fontSize: 12, marginTop: 16, minHeight: 16 }}>
-        {showFallback ? "Available on Android" : "Opening BTCC Hub…"}
+        Opens the app if it&apos;s installed, or the Play Store to get it
       </p>
     </div>
   );
