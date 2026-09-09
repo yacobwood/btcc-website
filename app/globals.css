@@ -1,16 +1,38 @@
 @import "tailwindcss";
 
 @theme inline {
+  /* Palette - verbatim from BTCC/src/theme/colors.js, the app's own design
+     tokens. Keep in sync if that file ever changes - no automated link
+     between the two repos. */
   --color-background: #080912;
   --color-surface: #0F1122;
-  --color-surface-2: #161828;
-  --color-btcc-red: #FEBD02;
-  --color-btcc-red-dark: #CC9800;
+  --color-card: #161828;
+  --color-btcc-yellow: #FEBD02;
+  --color-btcc-yellow-dark: #CC9800;
   --color-foreground: #FFFFFF;
   --color-muted: #8B8FA8;
   --color-border: #2A2D44;
+  --color-navy: #020255;
+
+  /* Medal colors - standings/results position badges */
+  --color-gold: #FFD700;
+  --color-silver: #C0C0C0;
+  --color-bronze: #CD7F32;
+
+  /* Stat-badge accents (driver profile / records), promoted from the app's
+     own one-off literals into real shared tokens here. */
+  --color-stat-points: #00C853;
+  --color-stat-podiums: #C0C0C0;
+  --color-stat-poles: #5BA3FF;
+  --color-stat-fastest-laps: #A855F7;
+  --color-stat-dnfs: #ff4444;
+
   --font-sans: var(--font-barlow);
-  --font-condensed: var(--font-barlow-condensed);
+  --font-display: var(--font-barlow-condensed);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
@@ -23,33 +45,49 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #0F1122;
 }
 ::-webkit-scrollbar-thumb {
   background: #2A2D44;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #FEBD02;
 }
 
-/* Article body content - only used on /news/[slug], which is styled to
-   match ArticleScreen.js's own WebView CSS exactly (buildHtml() in the app
-   repo) rather than the rest of the website's Barlow-Condensed look. Body
-   copy is plain white (#fff) here, not the website's usual muted gray -
-   that's a deliberate match to the app, not an oversight. */
+::selection {
+  background: #FEBD02;
+  color: #080912;
+}
+
+/* Ticker strip (MarqueeTicker) - content is duplicated by the component so
+   this only ever needs to travel exactly half its own scrollWidth to loop
+   seamlessly, regardless of how many items are passed in. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/* Hub News article body - matches the app's ArticleScreen.js WebView CSS
+   (buildHtml()) so a shared article reads identically on web and in-app. */
 .article-content {
   color: #fff;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.75;
 }
 .article-content p { margin: 0 0 1.4em; }
-.article-content h2 { font-weight: 800; font-size: 1.6em; color: #fff; margin: 1.8em 0 0.6em; }
-.article-content h3 { font-weight: 700; font-size: 1.3em; color: #fff; margin: 1.4em 0 0.5em; }
+.article-content h2 { font-weight: 800; font-size: 1.6em; color: #fff; margin: 1.8em 0 0.6em; font-family: var(--font-display); }
+.article-content h3 { font-weight: 700; font-size: 1.3em; color: #fff; margin: 1.4em 0 0.5em; font-family: var(--font-display); }
 .article-content a { color: #FEBD02; text-decoration: underline; }
 .article-content ul, .article-content ol {
   padding-left: 1.5em;
@@ -63,10 +101,6 @@ body {
 .article-content img { max-width: 100%; height: auto; margin: 1.5em 0; border-radius: 8px; }
 .article-content blockquote { border-left: 3px solid #FEBD02; margin: 1.5em 0; padding: 0.5em 1.2em; color: #8B8FA8; font-style: italic; }
 .article-content strong { color: #fff; font-weight: 700; }
-.article-content figure { margin: 1.5em 0; }
-.article-content figcaption { font-size: 13px; color: #8B8FA8; margin-top: 6px; text-align: center; }
-/* display:block + overflow-x here does the same job as the app's JS-inserted
-   .table-wrap div, without needing to post-process the raw HTML string. */
 .article-content table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; width: auto; min-width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0; }
 .article-content th, .article-content td { border: 1px solid #333; padding: 8px 10px; text-align: left; white-space: nowrap; }
 .article-content th { background: rgba(255,255,255,0.08); font-weight: 700; color: #fff; }

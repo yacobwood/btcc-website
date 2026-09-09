@@ -1,80 +1,63 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
-export default function Countdown({ targetDate, venue }: { targetDate: string; venue: string }) {
-  const [t, setT] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, live: false });
+function getRemaining(targetIso: string) {
+  const diff = new Date(targetIso).getTime() - Date.now();
+  const clamped = Math.max(diff, 0);
+  return {
+    days: Math.floor(clamped / 86_400_000),
+    hours: Math.floor((clamped % 86_400_000) / 3_600_000),
+    minutes: Math.floor((clamped % 3_600_000) / 60_000),
+    seconds: Math.floor((clamped % 60_000) / 1_000),
+    hasPassed: diff <= 0,
+  };
+}
+
+const UNITS: Array<{ key: "days" | "hours" | "minutes" | "seconds"; label: string }> = [
+  { key: "days", label: "Days" },
+  { key: "hours", label: "Hrs" },
+  { key: "minutes", label: "Min" },
+  { key: "seconds", label: "Sec" },
+];
+
+// Renders nothing time-sensitive until mounted - the server and the client's
+// first paint would otherwise disagree on "now", which React flags as a
+// hydration mismatch.
+export default function Countdown({ targetIso }: { targetIso: string }) {
+  const [remaining, setRemaining] = useState<ReturnType<typeof getRemaining> | null>(null);
 
   useEffect(() => {
-    const tick = () => {
-      const now = Date.now();
-      const target = new Date(targetDate).getTime();
-      const diff = target - now;
-      if (diff <= 0) {
-        setT({ days: 0, hours: 0, minutes: 0, seconds: 0, live: true });
-        return;
-      }
-      setT({
-        days: Math.floor(diff / 86400000),
-        hours: Math.floor((diff % 86400000) / 3600000),
-        minutes: Math.floor((diff % 3600000) / 60000),
-        seconds: Math.floor((diff % 60000) / 1000),
-        live: false,
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
+    // The synchronous setState right after mount is flagged by
+    // react-hooks/set-state-in-effect - deliberate here, same as this
+    // codebase's own established exception for this exact rule (see
+    // AppGate.tsx in the app repo): without it the countdown would render
+    // nothing for a full second until the interval's first tick.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRemaining(getRemaining(targetIso));
+    const id = setInterval(() => setRemaining(getRemaining(targetIso)), 1000);
     return () => clearInterval(id);
-  }, [targetDate]);
+  }, [targetIso]);
 
-  const unit = (n: number, label: string) => (
-    <div style={{ textAlign: "center", minWidth: 64 }}>
-      <div
-        style={{
-          fontFamily: "var(--font-barlow-condensed)",
-          fontWeight: 800,
-          fontSize: 40,
-          lineHeight: 1,
-          color: "#fff",
-        }}
-      >
-        {String(n).padStart(2, "0")}
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-barlow-condensed)",
-          fontWeight: 600,
-          fontSize: 10,
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          color: "#8B8FA8",
-          marginTop: 4,
-        }}
-      >
-        {label}
-      </div>
-    </div>
-  );
-
-  if (t.live) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FEBD02", animation: "pulse 1s infinite" }} />
-        <span style={{ fontFamily: "var(--font-barlow-condensed)", fontWeight: 800, fontSize: 20, color: "#FEBD02", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          Live Now
-        </span>
-      </div>
-    );
+  if (!remaining || remaining.hasPassed) {
+    return null;
   }
 
   return (
-    <div style={{ display: "flex", gap: 4, alignItems: "flex-start" }}>
-      {unit(t.days, "Days")}
-      <span style={{ fontFamily: "var(--font-barlow-condensed)", fontWeight: 800, fontSize: 36, color: "#FEBD02", lineHeight: 1, paddingTop: 2 }}>:</span>
-      {unit(t.hours, "Hours")}
-      <span style={{ fontFamily: "var(--font-barlow-condensed)", fontWeight: 800, fontSize: 36, color: "#FEBD02", lineHeight: 1, paddingTop: 2 }}>:</span>
-      {unit(t.minutes, "Mins")}
-      <span style={{ fontFamily: "var(--font-barlow-condensed)", fontWeight: 800, fontSize: 36, color: "#FEBD02", lineHeight: 1, paddingTop: 2 }}>:</span>
-      {unit(t.seconds, "Secs")}
+    <div className="flex gap-3">
+      {UNITS.map((unit) => (
+        <div
+          key={unit.key}
+          className="flex w-16 flex-col items-center rounded-xl border border-border bg-card py-2.5"
+        >
+          <span className="font-display text-2xl font-extrabold tabular-nums text-btcc-yellow">
+            {String(remaining[unit.key]).padStart(2, "0")}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted">
+            {unit.label}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

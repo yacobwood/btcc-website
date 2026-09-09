@@ -1,164 +1,64 @@
 import Link from "next/link";
+import { PLAY_STORE_URL } from "@/lib/appLinks";
+
+const FOOTER_LINKS = [
+  { href: "/news", label: "News" },
+  { href: "/results", label: "Results & Standings" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/circuits", label: "Circuits" },
+  { href: "/drivers", label: "Drivers" },
+  { href: "/teams", label: "Teams" },
+];
 
 export default function Footer() {
   return (
-    <footer style={{ background: "#0F1122", borderTop: "1px solid #161828", marginTop: 80 }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "48px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 40 }}>
-          {/* Brand */}
+    <footer className="border-t border-border bg-surface">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr]">
           <div>
-            <div
-              style={{
-                fontFamily: "var(--font-barlow-condensed)",
-                fontWeight: 800,
-                fontSize: 22,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                marginBottom: 12,
-              }}
-            >
-              <span style={{ color: "#FEBD02" }}>BTCC</span>
-            </div>
-            <p style={{ color: "#8B8FA8", fontSize: 14, lineHeight: 1.6, maxWidth: 240 }}>
-              Britain's premier motorsport series — three races, one weekend, unlimited drama.
+            <p className="font-display text-xl font-extrabold text-foreground">
+              BTCC <span className="text-btcc-yellow">HUB</span>
             </p>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
+              Live timing, real-time chat and push notifications for every session
+              are built into the free BTCC Hub app on Android - this site covers
+              news, results, standings and the full 2004-2026 archive.
+            </p>
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-btcc-yellow"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-btcc-yellow" aria-hidden>
+                <path d="M3 3.8v16.4c0 .5.28.94.7 1.16l9.9-9.36-9.9-9.36A1.3 1.3 0 0 0 3 3.8Zm13.86 8.2 2.9-2.06c.7-.5.7-1.58 0-2.08l-2.9-2.06-3.2 3.1 3.2 3.1Zm-3.98-2.9L4.1 2.36l9.6 9.06 2.18-2.32ZM4.1 21.64l8.78-8.28-2.18-2.32-6.6 10.6Z" />
+              </svg>
+              Get it on Google Play
+            </a>
           </div>
 
-          {/* Quick links */}
           <div>
-            <h4
-              style={{
-                fontFamily: "var(--font-barlow-condensed)",
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#8B8FA8",
-                marginBottom: 16,
-              }}
-            >
-              Quick Links
-            </h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { href: "/news", label: "Latest News" },
-                { href: "/drivers", label: "Drivers" },
-                { href: "/results", label: "Results & Standings" },
-                { href: "/calendar", label: "Race Calendar" },
-              ].map(({ href, label }) => (
+            <p className="text-xs font-bold uppercase tracking-widest text-muted">
+              Site
+            </p>
+            <nav className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2">
+              {FOOTER_LINKS.map((link) => (
                 <Link
-                  key={href}
-                  href={href}
-                  style={{
-                    color: "#8B8FA8",
-                    textDecoration: "none",
-                    fontSize: 14,
-                    transition: "color 0.2s",
-                  }}
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-muted transition-colors hover:text-foreground"
                 >
-                  {label}
+                  {link.label}
                 </Link>
               ))}
-            </div>
-          </div>
-
-          {/* More links */}
-          <div>
-            <h4
-              style={{
-                fontFamily: "var(--font-barlow-condensed)",
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#8B8FA8",
-                marginBottom: 16,
-              }}
-            >
-              More
-            </h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { href: "/teams", label: "Teams" },
-                { href: "/live", label: "Watch Live" },
-                { href: "/gallery", label: "Gallery" },
-                { href: "/partners", label: "Partners" },
-                { href: "/about", label: "About" },
-              ].map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  style={{
-                    color: "#8B8FA8",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Social */}
-          <div>
-            <h4
-              style={{
-                fontFamily: "var(--font-barlow-condensed)",
-                fontWeight: 700,
-                fontSize: 12,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#8B8FA8",
-                marginBottom: 16,
-              }}
-            >
-              Follow BTCC
-            </h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { href: "https://x.com/btcc", label: "X / Twitter" },
-                { href: "https://www.tiktok.com/@btcc", label: "TikTok" },
-                { href: "https://www.facebook.com/BTCCofficial", label: "Facebook" },
-                { href: "https://www.instagram.com/btcc", label: "Instagram" },
-                { href: "https://www.youtube.com/@BTCC", label: "YouTube" },
-              ].map(({ href, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "#8B8FA8",
-                    textDecoration: "none",
-                    fontSize: 14,
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
+            </nav>
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: 48,
-            paddingTop: 24,
-            borderTop: "1px solid #161828",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
-          <p style={{ color: "#8B8FA8", fontSize: 13 }}>
-            © 2026 British Touring Car Championship
-          </p>
-          <p style={{ color: "#4B5563", fontSize: 12 }}>
-            BTCC is a registered trademark of TOCA Ltd
-          </p>
+        <div className="mt-10 border-t border-border pt-6 text-xs text-muted">
+          BTCC Hub is an independent fan platform and is not an official BTCC
+          publication. Results, standings and calendar data are sourced and
+          published independently.
         </div>
       </div>
     </footer>

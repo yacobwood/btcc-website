@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
-import OpenInAppBanner from "@/components/OpenInAppBanner";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -17,12 +18,14 @@ const barlowCondensed = Barlow_Condensed({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://btcchub.vercel.app"),
-  title: "BTCC — British Touring Car Championship",
+  title: {
+    default: "BTCC Hub — News, Results & Standings",
+    template: "%s | BTCC Hub",
+  },
   description:
-    "The official home of the British Touring Car Championship. Latest news, race results, driver standings, and the 2026 season calendar.",
+    "News, results, standings and the full 2004-2026 season archive for the British Touring Car Championship.",
   openGraph: {
-    title: "BTCC — British Touring Car Championship",
-    description: "The official home of the British Touring Car Championship.",
+    siteName: "BTCC Hub",
     type: "website",
   },
 };
@@ -35,11 +38,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${barlow.variable} ${barlowCondensed.variable} antialiased`}
-        style={{ fontFamily: "var(--font-barlow), Arial, sans-serif", background: "#080912", color: "#fff" }}
+        className={`${barlow.variable} ${barlowCondensed.variable} flex min-h-screen flex-col font-sans antialiased`}
       >
-        <OpenInAppBanner />
-        {children}
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );

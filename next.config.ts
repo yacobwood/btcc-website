@@ -5,21 +5,25 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "btcc.net",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "www.btcc.net",
-        pathname: "/**",
-      },
-      {
-        // The app's article mirror (see project_wp_rest_api_lockdown memory -
-        // btcc.net's own wp-json API is now blocked/rate-limited, so both the
-        // app and this page read from this GitHub-hosted mirror instead).
-        protocol: "https",
         hostname: "raw.githubusercontent.com",
         pathname: "/yacobwood/BTCC/**",
+      },
+      {
+        // Gallery photos - hotlinked from BTCC's own public Supabase Storage
+        // bucket, same host + pattern the shipped mobile app already uses.
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      {
+        // Brands Hatch GP's circuit hero photo is hosted directly by MSV
+        // (Motorsport Vision, the venue's own operator) in tracks.json,
+        // unlike every other circuit's already-mirrored imageUrl - a known,
+        // previously-solved gap (see project_circuit_guide_seo_pages memory).
+        // Legitimate to hotlink: the venue operator's own official photo of
+        // its own venue, not third-party or competitor content.
+        protocol: "https",
+        hostname: "images.msv.com",
       },
     ],
   },
