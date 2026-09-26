@@ -72,11 +72,204 @@ body {
   to { transform: translateX(-50%); }
 }
 
+/* ------------------------------------------------------------------ */
+/* "Race Control" bento dashboard - broadcast-timing-tower panel chrome */
+/* ------------------------------------------------------------------ */
+
+/* Flat, functional panel - replaces the earlier skew/clip-path shape
+   language. Zero border-radius is deliberate: this reads as broadcast
+   graphics/timing-tower UI, not a soft consumer-app card. */
+.panel-hard {
+  position: relative;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* Glass variant for the 2-3 cells meant to feel more alive (timing tower,
+   circuit map) - real backdrop-filter, not a flat tint, so whatever's
+   behind it (the grain overlay, an adjacent photo) actually shows through. */
+.panel-glass {
+  position: relative;
+  border: 1px solid rgba(254, 189, 2, 0.25);
+  background: rgba(22, 24, 40, 0.55);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+/* Corner-bracket "reticle" chrome - two diagonal L-brackets that snap in on
+   hover/focus. Pure transform/opacity, no layout cost. :focus-visible
+   alongside :hover so keyboard users get the same affordance. */
+.corner-bracket::before,
+.corner-bracket::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-btcc-yellow);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+.corner-bracket::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+.corner-bracket::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+}
+.corner-bracket:hover::before,
+.corner-bracket:hover::after,
+.corner-bracket:focus-visible::before,
+.corner-bracket:focus-visible::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Start-lights hero overlay - modeled on the real 5-light BTCC/F1 start
+   sequence: lights illuminate left to right, hold, then snap out together
+   (the moment the race - and here, the headline - actually starts).
+   aria-hidden in markup; purely decorative, never gates the hero photo's
+   paint. */
+.start-lights {
+  display: flex;
+  gap: 0.75rem;
+}
+.start-light {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  animation: lights-on-sequence 1.3s ease-in forwards;
+}
+.start-light:nth-child(1) { animation-delay: 0s; }
+.start-light:nth-child(2) { animation-delay: 0.15s; }
+.start-light:nth-child(3) { animation-delay: 0.3s; }
+.start-light:nth-child(4) { animation-delay: 0.45s; }
+.start-light:nth-child(5) { animation-delay: 0.6s; }
+@keyframes lights-on-sequence {
+  0% { background: rgba(255, 255, 255, 0.15); box-shadow: none; }
+  15%, 70% { background: #ff2f2f; box-shadow: 0 0 12px 2px rgba(255, 47, 47, 0.7); }
+  85%, 100% { background: rgba(255, 255, 255, 0.15); box-shadow: none; }
+}
+
+/* Sitewide grain - one fixed layer, applied once in the root layout.
+   mix-blend-mode:overlay means it reads as texture, not a visible haze. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Circuit draw-on - targets ONLY the real stroked outline path (verified:
+   each bundled circuit SVG has exactly one path styled stroke:#febd02;
+   fill:none - the other ~40-50 paths per file are filled kerb/label
+   shapes and are untouched by this, since stroke-dasharray is inert on a
+   fill-only shape). 4000 comfortably exceeds every circuit's real path
+   length (each SVG's own viewBox tops out at a few hundred units) without
+   needing per-circuit measurement. */
+.circuit-draw path[style*="stroke:#febd02"] {
+  stroke-dasharray: 4000;
+  stroke-dashoffset: 4000;
+}
+@supports (animation-timeline: view()) {
+  .circuit-draw path[style*="stroke:#febd02"] {
+    animation: circuit-draw-on linear forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+  }
+}
+@keyframes circuit-draw-on {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Pointer-tilt custom properties (set by TiltCard.tsx's rAF loop) -
+   default to flat so server-rendered markup never shows a tilted card
+   before JS attaches. */
+.tilt-card {
+  --tilt-x: 0deg; /* horizontal pointer offset -> rotates around the Y axis */
+  --tilt-y: 0deg; /* vertical pointer offset -> rotates around the X axis */
+  transform: perspective(800px) rotateX(var(--tilt-y)) rotateY(var(--tilt-x));
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none !important;
   }
+  .start-light {
+    animation: none !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+  .circuit-draw path[style*="stroke:#febd02"] {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .tilt-card {
+    transform: none !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
+
+@media (pointer: coarse) {
+  .tilt-card {
+    transform: none !important;
+  }
+}
+
+/* Bento dashboard (Home) - replaces the earlier plain 2-column
+   news/standings grid. Single column, natural reading order, on mobile;
+   an asymmetric 4-column layout above md, one big featured-story cell
+   beside four smaller utility cells. */
+.bento-grid {
+  display: grid;
+  gap: 1rem;
+  /* minmax(0, 1fr), not bare 1fr - a bare 1fr track still respects its
+     item's default min-width:auto, so a non-shrinkable child (the inlined
+     circuit SVG was the one that actually hit this) forces the whole grid
+     wider than the viewport. Confirmed live: without this, the mobile page
+     genuinely overflowed horizontally (body.scrollWidth > innerWidth), not
+     just a visual nitpick. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "featured"
+    "timing"
+    "next"
+    "circuit"
+    "headlines";
+}
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, auto));
+    /* Paired by natural content height, not just topic - Next Up and
+       Circuit are both short/graphic cells; Timing Tower and Headlines are
+       both list-driven and naturally taller. Mismatched pairs stretch the
+       shorter cell to match its row and leave an awkward dead gap. */
+    grid-template-areas:
+      "featured featured next      circuit"
+      "featured featured timing    headlines";
+  }
+}
+.area-featured { grid-area: featured; }
+.area-timing { grid-area: timing; }
+.area-next { grid-area: next; }
+.area-circuit { grid-area: circuit; }
+.area-headlines { grid-area: headlines; }
 
 /* Hub News article body - matches the app's ArticleScreen.js WebView CSS
    (buildHtml()) so a shared article reads identically on web and in-app. */

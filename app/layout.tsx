@@ -40,6 +40,10 @@ export default function RootLayout({
       <body
         className={`${barlow.variable} ${barlowCondensed.variable} flex min-h-screen flex-col font-sans antialiased`}
       >
+        {/* Sitewide film-grain texture - fixed, aria-hidden, pointer-events
+            none. One layer for every page, near-zero cost (a single inline
+            SVG data URI, no extra network request). */}
+        <div className="grain-overlay" aria-hidden />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

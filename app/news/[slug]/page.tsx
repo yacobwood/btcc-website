@@ -59,6 +59,10 @@ export default async function NewsArticlePage({
             sizes="(min-width: 768px) 768px, 100vw"
             className="object-cover"
             priority
+            // Matches the homepage featured-story card's view-transition-name
+            // for this same post - the shared-element morph TransitionLink
+            // triggers on the homepage.
+            style={{ viewTransitionName: `news-photo-${post.id}` }}
           />
         </div>
       )}

@@ -197,3 +197,17 @@ export interface GallerySeasonFile {
   season: number;
   albums: GalleryAlbum[];
 }
+
+export interface GalleryPhoto {
+  thumbUrl: string;
+  viewUrl: string;
+}
+
+export interface GalleryAlbumDetail {
+  slug: string;
+  title: string;
+  year: number;
+  round: number | null;
+  venue: string | null;
+  photos: GalleryPhoto[];
+}

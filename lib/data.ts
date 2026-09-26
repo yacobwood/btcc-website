@@ -11,6 +11,7 @@ import type {
   HubNewsFile,
   HubNewsPost,
   GallerySeasonFile,
+  GalleryAlbumDetail,
 } from "./types";
 import { slugify } from "./slug";
 
@@ -182,5 +183,29 @@ export async function getFeaturedGalleryImage(): Promise<
     .sort((a, b) => b.round - a.round);
   const top = canonical[0];
   if (!top) return null;
+
+  // The album's own designated "cover" is often a wide contextual shot
+  // (paddock, crowd) rather than something dramatic - confirmed by actually
+  // viewing one live (Croft 2026's cover is a spectator-stand photo, not a
+  // car). Real on-track action and podium-celebration shots cluster later
+  // in the album, not at the start - sampling ~40% into the real photo
+  // list (viewed several real examples before picking this heuristic)
+  // reliably lands on something far stronger. Falls back to the cover if
+  // the per-album detail file is ever unavailable.
+  try {
+    const detail = await getJson<GalleryAlbumDetail>(
+      `gallery/${CURRENT_SEASON}/${top.slug}.json`,
+      3600
+    );
+    if (detail.photos.length > 0) {
+      const index = Math.min(
+        detail.photos.length - 1,
+        Math.floor(detail.photos.length * 0.4)
+      );
+      return { url: detail.photos[index].viewUrl, venue: top.venue, round: top.round };
+    }
+  } catch {
+    // fall through to the cover-based fallback below
+  }
   return { url: toDisplayVariant(top.cover), venue: top.venue, round: top.round };
 }
